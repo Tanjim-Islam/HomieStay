@@ -2,7 +2,10 @@ import './globals.css'
 import { Nunito } from 'next/font/google'
 import Navbar from "./components/navbar/Navbar"
 import RegisterModal from './components/modals/RegisterModal';
+import LoginModal from "./components/modals/LoginModal";
 import ToasterProvider from './providers/ToasterProvider';
+import getCurrentUser from './actions/getCurrentUser';
+
 
 const font = Nunito({ 
 
@@ -15,18 +18,22 @@ export const metadata = {
   description: "This is a University Project",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+
+  const currentUser = await getCurrentUser();
   return (
     <html lang="en">
       <body className={font.className}>
-        <ToasterProvider/>
+        <ToasterProvider />
         <RegisterModal />
-        <Navbar />
-        {children}</body>
+        <LoginModal />
+        <Navbar currentUser = {currentUser}/>
+        {children}
+      </body>
     </html>
-  )
+  );
 }
