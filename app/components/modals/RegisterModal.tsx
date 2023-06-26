@@ -98,7 +98,7 @@ const RegisterModal = () => {
           outline
           label="Continue with Google"
           icon={FcGoogle}
-          onClick={() => {}}
+          onClick={() => signIn("google")}
         />
 
         <hr />
@@ -106,7 +106,7 @@ const RegisterModal = () => {
           outline
           label="Continue with GitHub"
           icon={AiFillGithub}
-          onClick={() => signIn('github')}
+          onClick={() => signIn("github")}
         />
 
         <div
@@ -117,16 +117,17 @@ const RegisterModal = () => {
                 font-light
             "
         >
-          <div className='justify-center flex flex-row items-center gap-2'>
+          <div className="justify-center flex flex-row items-center gap-2">
             <div>Already Have an Account?</div>
-            <div 
-            onClick={registerModal.onClose}
-            className='
+            <div
+              onClick={registerModal.onClose}
+              className="
             text-neutral-800 
             cursor-pointer 
-            hover:underline'>
-                Log In
-                </div>
+            hover:underline"
+            >
+              Log In
+            </div>
           </div>
         </div>
       </div>

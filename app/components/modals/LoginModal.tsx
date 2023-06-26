@@ -107,7 +107,7 @@ const LoginModal = () => {
           outline
           label="Continue with GitHub"
           icon={AiFillGithub}
-          onClick={() => {}}
+          onClick={() => signIn('github')}
         />
 
         <div
@@ -118,7 +118,7 @@ const LoginModal = () => {
                 font-light
             "
         >
-          <div className='justify-center flex flex-row items-center gap-2'>
+          {/* <div className='justify-center flex flex-row items-center gap-2'>
             <div>Already Have an Account?</div>
             <div 
             onClick={registerModal.onClose}
@@ -128,7 +128,7 @@ const LoginModal = () => {
             hover:underline'>
                 Log In
                 </div>
-          </div>
+          </div> */}
         </div>
       </div>
     );
