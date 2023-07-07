@@ -63,6 +63,12 @@ const LoginModal = () => {
         })
     }
 
+    const toggle = useCallback(() => {
+      loginModal.onClose();
+      registerModal.onOpen();
+    },[loginModal, registerModal]);
+
+
     const bodyContent = (
       <div className="flex flex-col gap-4">
         <Heading
@@ -118,17 +124,17 @@ const LoginModal = () => {
                 font-light
             "
         >
-          {/* <div className='justify-center flex flex-row items-center gap-2'>
-            <div>Already Have an Account?</div>
+          <div className='justify-center flex flex-row items-center gap-2'>
+            <div>First time using HomieStay?</div>
             <div 
-            onClick={registerModal.onClose}
+            onClick={toggle}
             className='
             text-neutral-800 
             cursor-pointer 
             hover:underline'>
-                Log In
+                Create an Account
                 </div>
-          </div> */}
+          </div>
         </div>
       </div>
     );
