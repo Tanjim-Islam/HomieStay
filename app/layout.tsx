@@ -10,6 +10,8 @@ import RentModal from "./components/modals/RentModal";
 
 
 import getCurrentUser from './actions/getCurrentUser';
+import ClientOnly from './components/ClientOnly';
+
 
 
 const font = Nunito({ 
@@ -33,12 +35,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <ToasterProvider />
-        <RentModal />
-        <RegisterModal />
-        <LoginModal />
-        <Navbar currentUser={currentUser} />
-        {children}
+        <ClientOnly>
+          <ToasterProvider />
+          <RentModal />
+          <RegisterModal />
+          <LoginModal />
+          <Navbar currentUser={currentUser} />
+          {children}
+        </ClientOnly>
       </body>
     </html>
   );
