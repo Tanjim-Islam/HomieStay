@@ -1,14 +1,11 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { AuthOptions } from "next-auth";
+import bcrypt from "bcrypt";
+import NextAuth, { AuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
-
-
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import prisma from "@/app/libs/prismadb";
-import NextAuth from "next-auth/next";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -29,38 +26,39 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-            throw new Error ('Invalid Credentials');
+          throw new Error("Invalid credentials");
         }
+
         const user = await prisma.user.findUnique({
-            where: {
-                email: credentials.email
-            }
+          where: {
+            email: credentials.email,
+          },
         });
 
-        if(!user || !user?.hashedPassword) {
-            throw new Error ('User does not Exist');
+        if (!user || !user?.hashedPassword) {
+          throw new Error("Invalid credentials");
         }
 
         const isCorrectPassword = await bcrypt.compare(
-            credentials.password,
-            user.hashedPassword
+          credentials.password,
+          user.hashedPassword
         );
 
-        if(!isCorrectPassword) {
-            throw new Error('Wrong Password')
+        if (!isCorrectPassword) {
+          throw new Error("Invalid credentials");
         }
+
         return user;
-      }
+      },
     }),
   ],
   pages: {
-    signIn: '/'
+    signIn: "/",
   },
-  debug: process.env.NODE_ENV == 'development',
+  debug: process.env.NODE_ENV === "development",
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
-
   secret: process.env.NEXTAUTH_SECRET,
 };
 
