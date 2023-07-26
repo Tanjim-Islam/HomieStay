@@ -45,6 +45,7 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
 
   return (
     <Container>
+      <div className= "mt-9"></div>
       <Heading title="Properties" subtitle="List of your properties" />
       <div
         className="

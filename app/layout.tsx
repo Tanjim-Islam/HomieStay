@@ -12,6 +12,7 @@ import RentModal from "./components/modals/RentModal";
 import getCurrentUser from './actions/getCurrentUser';
 import ClientOnly from './components/ClientOnly';
 import { CrispProvider } from './components/crisp-provider';
+import SearchModal from './components/modals/SearchModal';
 
 
 
@@ -37,14 +38,15 @@ export default async function RootLayout({
     <html lang="en">
       <CrispProvider />
       <body className={font.className}>
-          <ClientOnly>
-            <ToasterProvider />
-            <RentModal />
-            <RegisterModal />
-            <LoginModal />
-            <Navbar currentUser={currentUser} />
-          </ClientOnly>
-          <div className="pb-20 pt-28">{children}</div>
+        <ClientOnly>
+          <ToasterProvider />
+          <RentModal />
+          <SearchModal />
+          <RegisterModal />
+          <LoginModal />
+          <Navbar currentUser={currentUser} />
+        </ClientOnly>
+        <div className="pb-20 pt-28">{children}</div>
       </body>
     </html>
   );
