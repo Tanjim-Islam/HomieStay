@@ -8,7 +8,6 @@ import RegisterModal from './components/modals/RegisterModal';
 import LoginModal from "./components/modals/LoginModal";
 import RentModal from "./components/modals/RentModal";
 
-
 import getCurrentUser from './actions/getCurrentUser';
 import ClientOnly from './components/ClientOnly';
 import { CrispProvider } from './components/crisp-provider';

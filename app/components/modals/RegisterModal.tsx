@@ -74,7 +74,7 @@ const RegisterModal = () => {
         />
         <Input
           id="email"
-          label="Email"
+          label="Email/Username"
           disabled={isLoading}
           register={register}
           errors={errors}
