@@ -5,15 +5,14 @@ import EmptyState from "@/app/components/EmptyState";
 import getListings, { IListingsParams } from "@/app/actions/getListings";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import ClientOnly from "./components/ClientOnly";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
 interface HomeProps {
-  searchParams: IListingsParams;
+  listings: any[];
+  currentUser: any;
 }
 
-const Home = async ({ searchParams }: HomeProps) => {
-  const listings = await getListings(searchParams);
-  const currentUser = await getCurrentUser();
-
+const Home = ({ listings = [], currentUser }: HomeProps) => {
   if (listings.length === 0) {
     return (
       <ClientOnly>
@@ -49,6 +48,21 @@ const Home = async ({ searchParams }: HomeProps) => {
       </Container>
     </ClientOnly>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const searchParams = context.query as IListingsParams;
+  const listings = (await getListings(searchParams)) || [];
+  const currentUser = await getCurrentUser();
+
+  return {
+    props: {
+      listings,
+      currentUser: currentUser || null,
+    },
+  };
 };
 
 export default Home;

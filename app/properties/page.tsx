@@ -1,3 +1,5 @@
+// app/properties/page.tsx
+
 import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "@/app/components/ClientOnly";
 
@@ -6,14 +8,15 @@ import getListings from "@/app/actions/getListings";
 
 import PropertiesClient from "./PropertiesClient";
 
-const PropertiesPage = async () => {
-  const currentUser = await getCurrentUser();
+interface PropertiesPageProps {
+  listings: any[];
+  currentUser: any;
+}
 
+const PropertiesPage = ({ listings, currentUser }: PropertiesPageProps) => {
   if (!currentUser) {
     return <EmptyState title="Unauthorized" subtitle="Please login" />;
   }
-
-  const listings = await getListings({ userId: currentUser.id });
 
   if (listings.length === 0) {
     return (
@@ -32,5 +35,27 @@ const PropertiesPage = async () => {
     </ClientOnly>
   );
 };
+
+export async function getServerSideProps() {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return {
+      props: {
+        listings: [],
+        currentUser: null,
+      },
+    };
+  }
+
+  const listings = await getListings({ userId: currentUser.id });
+
+  return {
+    props: {
+      listings,
+      currentUser,
+    },
+  };
+}
 
 export default PropertiesPage;
