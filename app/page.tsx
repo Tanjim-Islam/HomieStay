@@ -1,20 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Container from "@/app/components/Container";
 import ListingCard from "@/app/components/listings/ListingCard";
 import EmptyState from "@/app/components/EmptyState";
-
-import getListings, { IListingsParams } from "@/app/actions/getListings";
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import ClientOnly from "./components/ClientOnly";
 
 interface HomeProps {
-  searchParams: IListingsParams;
+  searchParams: any;
 }
 
-const Home = async ({ searchParams }: HomeProps) => {
-  const listings = await getListings(searchParams);
-  const currentUser = await getCurrentUser();
+const Home = ({ searchParams }: HomeProps) => {
+  const [listings, setListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!listings || listings.length === 0) {
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await fetch(
+          `/api/listings?${new URLSearchParams(searchParams)}`
+        );
+        const data = await res.json();
+        setListings(data);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, [searchParams]);
+
+  if (loading) {
+    return (
+      <ClientOnly>
+        <EmptyState showReset />
+      </ClientOnly>
+    );
+  }
+
+  if (listings.length === 0) {
     return (
       <ClientOnly>
         <EmptyState showReset />
@@ -39,11 +65,7 @@ const Home = async ({ searchParams }: HomeProps) => {
           "
         >
           {listings.map((listing: any) => (
-            <ListingCard
-              currentUser={currentUser}
-              key={listing.id}
-              data={listing}
-            />
+            <ListingCard key={listing.id} data={listing} />
           ))}
         </div>
       </Container>
