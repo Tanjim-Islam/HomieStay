@@ -34,8 +34,13 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const router = useRouter();
   const { getByValue } = useCountries();
 
-  const location = getByValue(data.locationValue);
+  // Memoize the location value
+  const location = useMemo(
+    () => getByValue(data.locationValue),
+    [getByValue, data.locationValue]
+  );
 
+  // Memoize the handleCancel function
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
@@ -49,6 +54,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
     [disabled, onAction, actionId]
   );
 
+  // Memoize the price value
   const price = useMemo(() => {
     if (reservation) {
       return reservation.totalPrice;
@@ -57,6 +63,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
     return data.price;
   }, [reservation, data.price]);
 
+  // Memoize the reservation date value
   const reservationDate = useMemo(() => {
     if (!reservation) {
       return null;
@@ -94,6 +101,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
             "
             src={data.imageSrc}
             alt="Listing"
+            loading="lazy" // Added lazy loading attribute
           />
           <div
             className="

@@ -15,6 +15,8 @@ import Counter from "../inputs/Counter";
 import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
 import Heading from "../Heading";
 
+import { debounce } from "lodash";
+
 enum STEPS {
   LOCATION = 0,
   DATE = 1,
@@ -43,7 +45,7 @@ const SearchModal = () => {
       dynamic(() => import("../Map"), {
         ssr: false,
       }),
-    [location]
+    []
   );
 
   const onBack = useCallback(() => {
@@ -54,55 +56,86 @@ const SearchModal = () => {
     setStep((value) => value + 1);
   }, []);
 
-  const onSubmit = useCallback(async () => {
-    if (step !== STEPS.INFO) {
-      return onNext();
-    }
-
-    let currentQuery = {};
-
-    if (params) {
-      currentQuery = qs.parse(params.toString());
-    }
-
-    const updatedQuery: any = {
-      ...currentQuery,
-      locationValue: location?.value,
+  // Extracted debounced function to avoid missing dependency issue
+  const debouncedFunction = debounce(
+    (
+      params,
+      location,
       guestCount,
       roomCount,
       bathroomCount,
-    };
+      dateRange,
+      step,
+      onNext,
+      searchModal,
+      router
+    ) => {
+      if (step !== STEPS.INFO) {
+        return onNext();
+      }
 
-    if (dateRange.startDate) {
-      updatedQuery.startDate = formatISO(dateRange.startDate);
-    }
+      let currentQuery = {};
 
-    if (dateRange.endDate) {
-      updatedQuery.endDate = formatISO(dateRange.endDate);
-    }
+      if (params) {
+        currentQuery = qs.parse(params.toString());
+      }
 
-    const url = qs.stringifyUrl(
-      {
-        url: "/",
-        query: updatedQuery,
-      },
-      { skipNull: true }
+      const updatedQuery: any = {
+        ...currentQuery,
+        locationValue: location?.value,
+        guestCount,
+        roomCount,
+        bathroomCount,
+      };
+
+      if (dateRange.startDate) {
+        updatedQuery.startDate = formatISO(dateRange.startDate);
+      }
+
+      if (dateRange.endDate) {
+        updatedQuery.endDate = formatISO(dateRange.endDate);
+      }
+
+      const url = qs.stringifyUrl(
+        {
+          url: "/",
+          query: updatedQuery,
+        },
+        { skipNull: true }
+      );
+
+      setStep(STEPS.LOCATION);
+      searchModal.onClose();
+      router.push(url);
+    },
+    500
+  );
+
+  const onSubmit = useCallback(() => {
+    debouncedFunction(
+      params,
+      location,
+      guestCount,
+      roomCount,
+      bathroomCount,
+      dateRange,
+      step,
+      onNext,
+      searchModal,
+      router
     );
-
-    setStep(STEPS.LOCATION);
-    searchModal.onClose();
-    router.push(url);
   }, [
-    step,
-    searchModal,
+    params,
     location,
-    router,
     guestCount,
     roomCount,
-    dateRange,
-    onNext,
     bathroomCount,
-    params,
+    dateRange,
+    step,
+    onNext,
+    searchModal,
+    router,
+    debouncedFunction,
   ]);
 
   const actionLabel = useMemo(() => {
@@ -132,7 +165,7 @@ const SearchModal = () => {
         onChange={(value) => setLocation(value as CountrySelectValue)}
       />
       <hr />
-      <Map center={location?.latlng} />
+      <Map center={location?.latlng} /> {/* The location is still used here */}
     </div>
   );
 
@@ -175,7 +208,7 @@ const SearchModal = () => {
           }}
           value={bathroomCount}
           title="Bathrooms"
-          subtitle="How many bahtrooms do you need?"
+          subtitle="How many bathrooms do you need?"
         />
       </div>
     );

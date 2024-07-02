@@ -1,25 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import getListings, { IListingsParams } from "@/app/actions/getListings";
 
 // GET method to fetch listings
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
-  let query: any = {};
-  if (userId) {
-    query.userId = userId;
-  }
+  const params: IListingsParams = {
+    userId: searchParams.get("userId") || undefined,
+    guestCount: searchParams.get("guestCount")
+      ? parseInt(searchParams.get("guestCount")!)
+      : undefined,
+    roomCount: searchParams.get("roomCount")
+      ? parseInt(searchParams.get("roomCount")!)
+      : undefined,
+    bathroomCount: searchParams.get("bathroomCount")
+      ? parseInt(searchParams.get("bathroomCount")!)
+      : undefined,
+    startDate: searchParams.get("startDate") || undefined,
+    endDate: searchParams.get("endDate") || undefined,
+    locationValue: searchParams.get("locationValue") || undefined,
+    category: searchParams.get("category") || undefined,
+    skip: searchParams.get("skip") ? parseInt(searchParams.get("skip")!) : 0,
+    take: searchParams.get("take") ? parseInt(searchParams.get("take")!) : 10,
+  };
 
   try {
-    const listings = await prisma.listing.findMany({
-      where: query,
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
+    const listings = await getListings(params);
     return NextResponse.json(listings);
   } catch (error) {
     console.error(error);
