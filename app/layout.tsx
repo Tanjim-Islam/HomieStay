@@ -23,7 +23,7 @@ const font = Nunito({
 
 export const metadata = {  
   title: "HomieStay",
-  description: "This is a University Project",
+  description: "Rent whatever you like!",
 };
 
 export default async function RootLayout({

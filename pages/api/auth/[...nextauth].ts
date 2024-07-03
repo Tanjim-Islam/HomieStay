@@ -4,8 +4,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-
 import prisma from "@/app/libs/prismadb";
+import jwt from "jsonwebtoken";
+import { JWT } from "next-auth/jwt";
+import { User } from "@prisma/client";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -55,10 +57,43 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/",
   },
-  debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
   },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    encode: async ({ secret, token }) => {
+      if (!token) {
+        throw new Error("Token is not provided");
+      }
+      const encodedToken = jwt.sign(token as object, secret, {
+        algorithm: "HS512",
+      });
+      return encodedToken;
+    },
+    decode: async ({ secret, token }) => {
+      if (!token) {
+        throw new Error("Token is not provided");
+      }
+      const decodedToken = jwt.verify(token, secret, { algorithms: ["HS512"] });
+      return decodedToken as JWT;
+    },
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token.user) {
+        session.user = token.user as User;
+      }
+      return session;
+    },
+  },
+  debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
 };
 
